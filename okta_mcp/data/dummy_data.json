@@ -1,0 +1,123 @@
+{
+  "users": [
+    {
+      "id": "user_1",
+      "username": "alice@example.com",
+      "firstName": "Alice",
+      "lastName": "Johnson",
+      "email": "alice@example.com",
+      "groups": ["group_1", "group_2"],
+      "applications": ["app_1", "app_3"],
+      "factors": [
+        {"factorType": "sms", "status": "ENROLLED"},
+        {"factorType": "totp", "status": "ENROLLED"}
+      ]
+    },
+    {
+      "id": "user_2",
+      "username": "bob@example.com",
+      "firstName": "Bob",
+      "lastName": "Smith",
+      "email": "bob@example.com",
+      "groups": ["group_2", "group_3"],
+      "applications": ["app_1", "app_2"],
+      "factors": [
+        {"factorType": "push", "status": "ENROLLED"}
+      ]
+    },
+    {
+      "id": "user_3",
+      "username": "carol@example.com",
+      "firstName": "Carol",
+      "lastName": "Davis",
+      "email": "carol@example.com",
+      "groups": ["group_1", "group_4"],
+      "applications": ["app_2", "app_4"],
+      "factors": []
+    },
+    {
+      "id": "user_4",
+      "username": "david@example.com",
+      "firstName": "David",
+      "lastName": "Miller",
+      "email": "david@example.com",
+      "groups": ["group_3"],
+      "applications": ["app_3", "app_5"],
+      "factors": [{"factorType": "sms", "status": "ENROLLED"}]
+    },
+    {
+      "id": "user_5",
+      "username": "eve@example.com",
+      "firstName": "Eve",
+      "lastName": "Wilson",
+      "email": "eve@example.com",
+      "groups": ["group_5"],
+      "applications": ["app_5"],
+      "factors": [{"factorType": "totp", "status": "ENROLLED"}]
+    },
+    {
+      "id": "user_6",
+      "username": "frank@example.com",
+      "firstName": "Frank",
+      "lastName": "Taylor",
+      "email": "frank@example.com",
+      "groups": ["group_1", "group_5"],
+      "applications": ["app_1", "app_4"],
+      "factors": [{"factorType": "push", "status": "ENROLLED"}]
+    },
+    {
+      "id": "user_7",
+      "username": "grace@example.com",
+      "firstName": "Grace",
+      "lastName": "Anderson",
+      "email": "grace@example.com",
+      "groups": ["group_2", "group_4"],
+      "applications": ["app_2", "app_3"],
+      "factors": []
+    },
+    {
+      "id": "user_8",
+      "username": "henry@example.com",
+      "firstName": "Henry",
+      "lastName": "Thomas",
+      "email": "henry@example.com",
+      "groups": ["group_3"],
+      "applications": ["app_4", "app_5"],
+      "factors": [{"factorType": "sms", "status": "ENROLLED"}]
+    },
+    {
+      "id": "user_9",
+      "username": "irene@example.com",
+      "firstName": "Irene",
+      "lastName": "Moore",
+      "email": "irene@example.com",
+      "groups": ["group_4"],
+      "applications": ["app_1", "app_5"],
+      "factors": [{"factorType": "totp", "status": "ENROLLED"}]
+    },
+    {
+      "id": "user_10",
+      "username": "jack@example.com",
+      "firstName": "Jack",
+      "lastName": "Brown",
+      "email": "jack@example.com",
+      "groups": ["group_5"],
+      "applications": ["app_2", "app_3"],
+      "factors": [{"factorType": "push", "status": "ENROLLED"}]
+    }
+  ],
+  "groups": [
+    {"id": "group_1", "name": "Admins", "description": "Administrator group", "users": ["user_1", "user_3", "user_6"], "applications": ["app_1"]},
+    {"id": "group_2", "name": "Developers", "description": "Developer group", "users": ["user_1", "user_2", "user_7"], "applications": ["app_2"]},
+    {"id": "group_3", "name": "QA", "description": "Quality Assurance group", "users": ["user_2", "user_4", "user_8"], "applications": ["app_3"]},
+    {"id": "group_4", "name": "Support", "description": "Support team group", "users": ["user_3", "user_7", "user_9"], "applications": ["app_4"]},
+    {"id": "group_5", "name": "HR", "description": "Human Resources group", "users": ["user_5", "user_6", "user_10"], "applications": ["app_5"]}
+  ],
+  "applications": [
+    {"id": "app_1", "name": "HR Portal", "users": ["user_1", "user_2", "user_6", "user_9"], "groups": ["group_1"]},
+    {"id": "app_2", "name": "Dev Tools", "users": ["user_2", "user_3", "user_7", "user_10"], "groups": ["group_2"]},
+    {"id": "app_3", "name": "QA Dashboard", "users": ["user_1", "user_4", "user_7", "user_10"], "groups": ["group_3"]},
+    {"id": "app_4", "name": "Support Portal", "users": ["user_3", "user_6", "user_8"], "groups": ["group_4"]},
+    {"id": "app_5", "name": "Payroll", "users": ["user_4", "user_5", "user_8", "user_9"], "groups": ["group_5"]}
+  ]
+}
