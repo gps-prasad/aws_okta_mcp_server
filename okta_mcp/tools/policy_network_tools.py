@@ -15,7 +15,7 @@ from okta_mcp.utils.normalize_okta_responses import normalize_okta_response, pag
 load_dotenv()
 logger = logging.getLogger("okta_mcp_server")
 
-async def make_async_request(method: str, url: str, headers: Dict = None, json_data: Dict = None):
+async def make_async_request(method: str, url: str, headers: Dict = None,params: Dict =None, json_data: Dict = None):
     """Make an async HTTP request to the Okta API."""
     try:
         import aiohttp
@@ -25,6 +25,7 @@ async def make_async_request(method: str, url: str, headers: Dict = None, json_d
                 method=method,
                 url=url,
                 headers=headers,
+                params=params,
                 json=json_data
             ) as response:
                 response.raise_for_status()
@@ -146,7 +147,117 @@ def register_policy_tools(server: FastMCP, okta_client: OktaMcpClient):
             if ctx:
                 await ctx.error(f"Error in list_policy_rules tool for policy_id {policy_id}: {str(e)}")
             return handle_okta_result(e, "list_policy_rules")
-        
+
+    @server.tool()
+    async def get_okta_policies(
+        policy_type:str = Field(...,description=("Name of the okta policy that need to be retrived")),
+        ctx: Context = None
+    ) -> Dict[str, Any]:
+        """Get detailed information about Okta policies
+
+            Returns comprehensive information about policies configured in your Okta organization, including:
+
+            Policy Identification and Metadata:
+            • Policy ID, name, type (e.g., OKTA_SIGN_ON, PASSWORD, MFA_ENROLL)
+            • Description, status (active/inactive), and priority
+            • Creation and modification timestamps, administrative metadata
+
+            Targeting and Scope:
+            • Users and groups included or excluded
+            • Organizational units or application targets
+            • Device and platform applicability
+
+            Authentication and Access Requirements:
+            • Required authentication factors for the policy
+            • Step-up authentication triggers
+            • Session management behaviors (timeouts, idle session limits)
+
+            Network and Contextual Constraints:
+            • IP ranges and network zones allowed or blocked
+            • Location-based restrictions
+            • VPN/proxy handling
+
+            Risk Assessment Criteria:
+            • Conditions based on device trust, user context, or behavioral patterns
+            • Integration with threat intelligence or contextual access policies
+
+            Common Use Cases:
+            • Reviewing organizational security policies
+            • Compliance auditing
+            • Planning policy modifications
+            • Access control verification and enforcement
+            """
+        try:
+            logger.info("SERVER: Executing get_okta_policies")
+            if ctx:
+                await ctx.info("Executing get_okta_policies")
+                await ctx.report_progress(10, 100)
+            
+            if ctx:
+                await ctx.report_progress(30, 100)
+            
+            # Get the Okta organization URL and API token
+            org_url = os.getenv('OKTA_CLIENT_ORGURL')
+            api_token = os.getenv('OKTA_API_TOKEN')
+            
+            if not org_url:
+                raise ValueError("OKTA_CLIENT_ORGURL environment variable not set")
+            if not api_token:
+                raise ValueError("OKTA_API_TOKEN environment variable not set")
+                
+            # Remove trailing slash if present
+            if org_url.endswith('/'):
+                org_url = org_url[:-1]
+            
+            # Setup headers for direct API call
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': f'SSWS {api_token}'
+            }
+            
+            # Make the direct API request
+            url = f"{org_url}/api/v1/policies"
+            
+            if ctx:
+                await ctx.info(f"Making direct API call to: {url}")
+                await ctx.report_progress(60, 100)
+            
+            response = await make_async_request(
+                method="GET",
+                url=url,
+                headers=headers,
+                params={"type":policy_type},
+                json_data=None,
+            )
+            
+            if ctx:
+                await ctx.info(f"Successfully retrieved policies information using direct API call")
+                await ctx.report_progress(100, 100)
+            
+            return {"policies":response}
+            
+        except anyio.ClosedResourceError:
+            logger.warning("Client disconnected during get_okta_policy_rule. Server remains healthy.")
+            return None
+            
+        except Exception as e:
+            # Check for rate limit
+            error_msg = str(e).lower()
+            if 'rate limit' in error_msg or 'too many requests' in error_msg:
+                logger.warning("Rate limit hit in get_okta_policy_rule")
+                return {
+                    'error': 'rate_limit',
+                    'message': 'Okta API rate limit exceeded. Please wait a moment and try again.',
+                    'tool': 'get_okta_policy_rule'
+                }
+            
+            logger.exception(f"Error in get_okta_policies tool")
+            if ctx:
+                await ctx.error(f"Error in get_okta_policies tool: {str(e)}")
+            return handle_okta_result(e, "get_okta_policies")    
+    
+
     @server.tool()
     async def get_okta_policy_rule(
         policy_id: str = Field(..., description="The ID of the policy that contains the rule"),
@@ -257,7 +368,7 @@ def register_policy_tools(server: FastMCP, okta_client: OktaMcpClient):
             if ctx:
                 await ctx.info(f"Successfully retrieved rule information using direct API call")
                 await ctx.report_progress(100, 100)
-            
+            print(response)
             return response
             
         except anyio.ClosedResourceError:

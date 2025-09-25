@@ -1,5 +1,6 @@
 implementation-plan.md
 venv/*
+.venv/*
 .env
 examples/*
 __pycache__/
