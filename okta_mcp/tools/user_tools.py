@@ -49,6 +49,16 @@ def register_user_tools(server: FastMCP, okta_client: OktaMcpClient):
         - Users in SF or London: search='profile.city eq "San Francisco" or profile.city eq "London"'
         - Sorted results: search='status eq "ACTIVE"', sort_by='profile.lastName', sort_order='asc'
         - Custom attribute search: search='profile.employeeNumber eq "12345"'
+
+        Return Object:
+
+        The response includes:
+
+        users (array) – A list of user objects matching the filter. 
+
+        message (string) - A short summary describing the result of the query (e.g., how many users were returned or relevant filter summary).
+
+        _meta (object) – Meta data for client side only. Not intended for LLM context or processing.
             
         """
         try:
@@ -127,6 +137,15 @@ def register_user_tools(server: FastMCP, okta_client: OktaMcpClient):
             else:
                 result["message"] = f"Found {len(all_users)} users matching your criteria."
             
+            result["_meta"] = {
+                                "query": query,
+                                "search": search,
+                                "filter_type": filter_type,
+                                "sort_by": sort_by,
+                                "sort_order": sort_order,
+                                "max_results": max_results
+                            }
+
             return result
             
         except anyio.ClosedResourceError:
