@@ -7,6 +7,7 @@ import anyio
 from typing import Dict, Any, Optional, List
 from fastmcp import FastMCP, Context
 from pydantic import BaseModel, Field
+import json
 
 from okta_mcp.utils.okta_client import OktaMcpClient
 from okta_mcp.utils.error_handling import handle_okta_result
@@ -25,7 +26,7 @@ def register_log_events_tools(server: FastMCP, okta_client: OktaMcpClient):
         q: str = Field(default="", description="Search term for log events"),
         sort_order: str = Field(default="DESCENDING", description="Order of results (ASCENDING or DESCENDING)"),
         ctx: Context = None
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, Any] | str:
         """Get Okta system log events with comprehensive filtering and full pagination for complete audit trails.
         
         Returns detailed log events from Okta system logs including authentication, user management,
@@ -166,14 +167,16 @@ def register_log_events_tools(server: FastMCP, okta_client: OktaMcpClient):
                 logger.info(f"Retrieved {len(all_log_events)} log events across {page_count} pages")
                 await ctx.report_progress(100, 100)
             
-            return {
+            response = {
                 "log_events": [event.as_dict() for event in all_log_events],
                 "pagination": {
                     "total_pages": page_count,
                     "total_results": len(all_log_events)
                 }
             }
-            
+            response = json.dumps(response)
+            return response
+
         except anyio.ClosedResourceError:
             logger.warning("Client disconnected during get_okta_event_logs. Server remains healthy.")
             return None

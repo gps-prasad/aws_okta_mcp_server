@@ -80,7 +80,7 @@ def main():
     
     try:
         # Import server module
-        from okta_mcp.server import create_server, run_with_http, run_with_sse, run_with_stdio
+        from okta_mcp.server import create_server, run_with_http
         
         # Create server (now with optional auth)
         server = create_server(enable_auth=not args.no_auth)
