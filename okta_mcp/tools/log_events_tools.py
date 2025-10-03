@@ -174,7 +174,6 @@ def register_log_events_tools(server: FastMCP, okta_client: OktaMcpClient):
                     "total_results": len(all_log_events)
                 }
             }
-            response = json.dumps(response)
             return response
 
         except anyio.ClosedResourceError:
